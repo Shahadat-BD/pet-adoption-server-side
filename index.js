@@ -24,7 +24,7 @@ async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
-    // const petCollection = client.db("petAdoption").collection("allPet")
+    const petCollection = client.db("petAdoption").collection("allPet")
     const userCollection = client.db("petAdoption").collection("user")
     
     // middleware
@@ -58,11 +58,17 @@ async function run() {
    }
 
     // pet added using POST API.
-    // app.post('/addPet',async(req,res) => {
-    //    const pets = req.body
-    //    const result = await petCollection.insertOne(pets)
-    //    res.send(result)
-    // })
+    app.post('/addPet',async(req,res) => {
+       const pets = req.body
+       const result = await petCollection.insertOne(pets)
+       res.send(result)
+    })
+ 
+    // all pet getting
+    app.get('/addPet',async(req,res)=>{
+      const result = await petCollection.find().toArray()
+      res.send(result)
+    })
 
     app.post('/user',async(req,res)=>{
       const user = req.body;
@@ -100,7 +106,7 @@ app.get('/user/admin/:email',verifyToken,async(req,res)=>{
  
 // create user admin
 app.patch('/user/admin/:id',verifyToken,verifyAdmin,async(req,res)=>{
-  const userId = req.params.id
+  const userId = req.params.id 
   const filter = {_id : new ObjectId(userId)}
   const updateDoc = {
       $set : {

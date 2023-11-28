@@ -27,6 +27,8 @@ async function run() {
     const petCollection = client.db("petAdoption").collection("allPet")
     const userCollection = client.db("petAdoption").collection("user")
     const adoptReqCollection = client.db("petAdoption").collection("adoptReq")
+    const CampaignInfoCollection = client.db("petAdoption").collection("campaignInfo")
+    const donationInfoCollection = client.db("petAdoption").collection("donationInfo")
 
     // middleware
 
@@ -78,25 +80,95 @@ async function run() {
       res.send(result)
     })
 
-    // user request info for pet adoption 
+    // user request info post for pet adoption 
     app.post('/adoptReq', async (req, res) => {
       const request = req.body
       const result = await adoptReqCollection.insertOne(request)
+      res.send(result)
     })
 
-    // when user any pet adopt then adopted property was true.
-    app.patch('/addPet/:id', async (req, res) => {
+  // user request info get
+   app.get('/adoptReq',async(req,res)=>{
+     const result = await adoptReqCollection.find().toArray()
+     res.send(result)
+   })
+
+  //  pets are delete for admin user.
+  app.delete('/addPet/:id',async(req,res)=>{
+    const id = req.params.id
+    const query = {_id : new ObjectId(id)}
+    const result = await petCollection.deleteOne(query)
+    res.send(result)
+  })
+   
+  // update pet of user.
+  app.patch('/addPet/:id',async(req,res)=>{
+    const id = req.params.id
+    const pets = req.body
+    const filter = {_id : new ObjectId(id)}
+    const updateDoc = {
+     $set: {
+      petName : pets.petName,
+      petAge : pets.petAge,
+      petLocation : pets.petLocation,
+      category :  pets.category,
+      petOwnerInfo : pets.petOwnerInfo,
+      petDescription : pets.petDescription,
+      image : pets.image
+     },
+   };
+   const updatedPetInfo = await petCollection.updateOne(filter,updateDoc)
+   res.send(updatedPetInfo)
+  })
+
+    // admin any pet doing adopted (false => true) but user only updated 'adopted' his pets added.
+    app.put('/addPet/:id', async (req, res) => {
       const petId = req.params.id
       const updatedAdopt = req.body
       const filter = { _id: new ObjectId(petId) }
       const updateDoc = {
         $set: {
-          adopted : updatedAdopt.adopted
+          adopted : updatedAdopt.adopted 
         }
       }
       const result = await petCollection.updateOne(filter, updateDoc)
       res.send(result)
     })
+
+   app.get("/addPet/:email",async(req,res) => {
+    const email = req.params.email 
+    const query = { email: email } 
+    const result = await petCollection.find(query).toArray()
+    res.send(result)
+   })
+
+
+  // donation campaign information post.
+  app.post('/addCampaign',async(req,res)=>{
+     const campaignInfo = req.body
+     const result = await CampaignInfoCollection.insertOne(campaignInfo)
+     res.send(result)
+  })
+  app.get('/addCampaign',async(req,res)=>{
+     const result = await CampaignInfoCollection.find().toArray()
+     res.send(result)
+  })
+
+  // specefic donation campaign collect.
+  app.get('/addCampaign/:id',async(req,res)=>{
+    const id = req.params.id
+    const query = {_id : new ObjectId(id)}
+    const result = await CampaignInfoCollection.findOne(query)
+    res.send(result)
+  })
+
+  // donated user information post.
+  app.post('/donationUser',async(req,res)=>{
+    const donatedUserInfo = req.body
+    const result = await donationInfoCollection.insertOne(donatedUserInfo)
+    res.send(result)
+  })
+ 
 
     app.post('/user', async (req, res) => {
       const user = req.body;

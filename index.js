@@ -93,6 +93,36 @@ async function run() {
      res.send(result)
    })
 
+  // user request accepted  by patch. a
+
+  app.patch('/adoptReq/:id', async (req, res) => {
+    const userId = req.params.id
+    const filter = { _id: new ObjectId(userId) }
+    const updateDoc = {
+      $set: {
+        accept: true
+      }
+    }
+    const result = await adoptReqCollection.updateOne(filter, updateDoc)
+    res.send(result)
+  })
+
+  // user request rejected by put. 
+
+  app.put('/adoptReq/:id', async (req, res) => {
+    const petId = req.params.id
+    const rejectAdopt = req.body
+    const filter = { _id: new ObjectId(petId) }
+    const updateDoc = {
+      $set: {
+        accept : rejectAdopt.accept
+      }
+    }
+    const result = await adoptReqCollection.updateOne(filter, updateDoc)
+    res.send(result)
+  })
+
+
   //  pets are delete for admin user.
   app.delete('/addPet/:id',async(req,res)=>{
     const id = req.params.id
@@ -121,7 +151,7 @@ async function run() {
    res.send(updatedPetInfo)
   })
 
-    // admin any pet doing adopted (false => true) but user only updated 'adopted' his pets added.
+    // admin any pet doing adopted (false => true).
     app.put('/addPet/:id', async (req, res) => {
       const petId = req.params.id
       const updatedAdopt = req.body
@@ -135,23 +165,46 @@ async function run() {
       res.send(result)
     })
 
-   app.get("/addPet/:email",async(req,res) => {
-    const email = req.params.email 
-    const query = { email: email } 
-    const result = await petCollection.find(query).toArray()
-    res.send(result)
-   })
-
-
   // donation campaign information post.
   app.post('/addCampaign',async(req,res)=>{
      const campaignInfo = req.body
      const result = await CampaignInfoCollection.insertOne(campaignInfo)
      res.send(result)
   })
+
+  // get donation campaign which is created 
   app.get('/addCampaign',async(req,res)=>{
      const result = await CampaignInfoCollection.find().toArray()
      res.send(result)
+  }) 
+
+    // donation campaign updated using patch
+
+  app.patch('/addCampaign/:id',async(req,res)=>{
+    const id = req.params.id
+    const donation = req.body
+    const filter = {_id : new ObjectId(id)}
+    const updateDoc = {
+    $set: {
+      petName : donation.petName, 
+      donationAmount : donation.donationAmount,
+      lastDate : donation.lastDate,
+      shortInfo : donation.shortInfo,
+      longInfo : donation.longInfo,
+      image : donation.image
+     },
+   };
+   const donationInfoUpdate = await CampaignInfoCollection.updateOne(filter,updateDoc)
+   res.send(donationInfoUpdate)
+  })
+
+  // delted campaign by admin 
+
+  app.delete('/addCampaign/:id',async(req,res)=>{
+      const id = req.params.id
+      const query = {_id : new ObjectId(id)}
+      const result = await CampaignInfoCollection.deleteOne(query)
+      res.send(result)
   })
 
   // specefic donation campaign collect.
@@ -164,12 +217,16 @@ async function run() {
 
   // donated user information post.
   app.post('/donationUser',async(req,res)=>{
-    const donatedUserInfo = req.body
+    const donatedUserInfo = req.body 
     const result = await donationInfoCollection.insertOne(donatedUserInfo)
     res.send(result)
   })
- 
 
+  app.get('/donationUser', async(req,res)=>{
+    const result = await donationInfoCollection.find().toArray()
+    res.send(result)
+  })
+ 
     app.post('/user', async (req, res) => {
       const user = req.body;
       // insert email if user doesn't exits.

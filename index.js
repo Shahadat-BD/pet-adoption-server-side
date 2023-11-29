@@ -121,7 +121,15 @@ async function run() {
     const result = await adoptReqCollection.updateOne(filter, updateDoc)
     res.send(result)
   })
-
+  
+  // user adoption request deleted if you can.
+   
+  app.delete('/adoptReq/:id',async(req,res)=>{
+    const id = req.params.id
+    const query = {_id : new ObjectId(id)}
+    const result = await adoptReqCollection.deleteOne(query)
+    res.send(result)
+  })
 
   //  pets are delete for admin user.
   app.delete('/addPet/:id',async(req,res)=>{
@@ -214,6 +222,21 @@ async function run() {
     const result = await CampaignInfoCollection.findOne(query)
     res.send(result)
   })
+
+  app.put('/addCampaign/:id', async (req, res) => {
+    const campaignId = req.params.id
+    const donationAmount = req.body
+    const filter = { _id: new ObjectId(campaignId) }
+    const updateDoc = {
+      $set: {
+        donation: donationAmount.donation
+      }
+    }
+    const result = await CampaignInfoCollection.updateOne(filter, updateDoc)
+    res.send(result)
+  })
+
+  
 
   // donated user information post.
   app.post('/donationUser',async(req,res)=>{

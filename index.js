@@ -23,7 +23,7 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
+    // await client.connect();
     const petCollection = client.db("petAdoption").collection("allPet")
     const userCollection = client.db("petAdoption").collection("user")
     const adoptReqCollection = client.db("petAdoption").collection("adoptReq")
@@ -66,12 +66,13 @@ async function run() {
       const result = await petCollection.insertOne(pets)
       res.send(result)
     })
-
+ 
     // all pet getting
     app.get('/addPet', async (req, res) => {
       const result = await petCollection.find().toArray()
       res.send(result)
     })
+  
     // specific pet get
     app.get('/addPet/:id', async (req, res) => {
       const id = req.params.id
@@ -181,11 +182,10 @@ async function run() {
   })
 
   // get donation campaign which is created 
-  app.get('/addCampaign',async(req,res)=>{
+  app.get('/addCampaign',  async(req,res)=>{
      const result = await CampaignInfoCollection.find().toArray()
-     res.send(result)
-  }) 
-
+     res.send(result) 
+  })    
     // donation campaign updated using patch
 
   app.patch('/addCampaign/:id',async(req,res)=>{
@@ -208,7 +208,7 @@ async function run() {
 
   // delted campaign by admin 
 
-  app.delete('/addCampaign/:id',async(req,res)=>{
+  app.delete('/addCampaign/:id', async(req,res)=>{
       const id = req.params.id
       const query = {_id : new ObjectId(id)}
       const result = await CampaignInfoCollection.deleteOne(query)
@@ -225,17 +225,17 @@ async function run() {
 
   app.put('/addCampaign/:id', async (req, res) => {
     const campaignId = req.params.id
-    const donationAmount = req.body
     const filter = { _id: new ObjectId(campaignId) }
     const updateDoc = {
       $set: {
-        donation: donationAmount.donation
+        paused : false,
       }
     }
     const result = await CampaignInfoCollection.updateOne(filter, updateDoc)
     res.send(result)
   })
 
+ 
   
 
   // donated user information post.

@@ -206,7 +206,7 @@ async function run() {
    res.send(donationInfoUpdate)
   })
 
-  // delted campaign by admin 
+  // deleted campaign by admin 
 
   app.delete('/addCampaign/:id', async(req,res)=>{
       const id = req.params.id
@@ -215,7 +215,7 @@ async function run() {
       res.send(result)
   })
 
-  // specefic donation campaign collect.
+  // specific donation campaign collect.
   app.get('/addCampaign/:id',async(req,res)=>{
     const id = req.params.id
     const query = {_id : new ObjectId(id)}
@@ -223,19 +223,6 @@ async function run() {
     res.send(result)
   })
 
-  app.put('/addCampaign/:id', async (req, res) => {
-    const campaignId = req.params.id
-    const filter = { _id: new ObjectId(campaignId) }
-    const updateDoc = {
-      $set: {
-        paused : false,
-      }
-    }
-    const result = await CampaignInfoCollection.updateOne(filter, updateDoc)
-    res.send(result)
-  })
-
- 
   
 
   // donated user information post.
